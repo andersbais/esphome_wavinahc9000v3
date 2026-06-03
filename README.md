@@ -45,7 +45,6 @@ packages:
 3. In Home Assistant go to **Developer Tools → Actions** and call `esphome.<node>_wavin_publish_yaml_text_sensors`
 4. Go to **Developer Tools → Template**, paste the contents of `jinja_examples.j2` from this repo, and copy the rendered YAML from the Result panel
 5. Paste the generated YAML into your permanent `wavin.yaml`, remove the `yaml_generator` package, and reflash.
-6. ******************** ******************** ******************** ******************** ******************** ******************** ********************
 
 # ESPHome Component: Wavin AHC 9000 / Jablotron AC-116 (v3 restart)
 
