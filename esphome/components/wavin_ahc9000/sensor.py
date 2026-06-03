@@ -15,23 +15,49 @@ CONF_PARENT_ID = "wavin_ahc9000_id"
 CONF_CHANNEL = "channel"
 CONF_TYPE = "type"
 
-CONFIG_SCHEMA = sensor.sensor_schema(
+TEMPERATURE_SCHEMA = sensor.sensor_schema(
+    unit_of_measurement=UNIT_CELSIUS,
+    device_class=DEVICE_CLASS_TEMPERATURE,
+    accuracy_decimals=1,
+    state_class=STATE_CLASS_MEASUREMENT,
+).extend({
+    cv.GenerateID(CONF_PARENT_ID): cv.use_id(WavinAHC9000),
+    cv.Required(CONF_CHANNEL): cv.int_range(min=1, max=16),
+    cv.Required(CONF_TYPE): cv.one_of(
+        "temperature", "comfort_setpoint", "floor_temperature",
+        "floor_min_temperature", "floor_max_temperature", lower=True
+    ),
+})
+
+BATTERY_SCHEMA = sensor.sensor_schema(
     unit_of_measurement=UNIT_PERCENT,
     device_class=DEVICE_CLASS_BATTERY,
     icon=ICON_BATTERY,
     accuracy_decimals=0,
     state_class=STATE_CLASS_MEASUREMENT,
-).extend(
-    {
-        cv.GenerateID(CONF_PARENT_ID): cv.use_id(WavinAHC9000),
-        cv.Required(CONF_CHANNEL): cv.int_range(min=1, max=16),
-        cv.Required(CONF_TYPE): cv.one_of(
-            "battery", "temperature", "comfort_setpoint",
-            "floor_temperature", "floor_min_temperature", "floor_max_temperature",
-            lower=True
-        ),
-    }
-)
+).extend({
+    cv.GenerateID(CONF_PARENT_ID): cv.use_id(WavinAHC9000),
+    cv.Required(CONF_CHANNEL): cv.int_range(min=1, max=16),
+    cv.Required(CONF_TYPE): cv.one_of("battery", lower=True),
+})
+
+def _validate(config):
+    if config[CONF_TYPE] == "battery":
+        return BATTERY_SCHEMA(config)
+    return TEMPERATURE_SCHEMA(config)
+
+CONFIG_SCHEMA = cv.Schema({
+    cv.GenerateID(CONF_PARENT_ID): cv.use_id(WavinAHC9000),
+    cv.Required(CONF_CHANNEL): cv.int_range(min=1, max=16),
+    cv.Required(CONF_TYPE): cv.one_of(
+        "battery", "temperature", "comfort_setpoint",
+        "floor_temperature", "floor_min_temperature", "floor_max_temperature",
+        lower=True
+    ),
+    cv.Optional("name"): cv.string,
+}, extra=cv.ALLOW_EXTRA)
+
+CONFIG_SCHEMA = cv.All(CONFIG_SCHEMA, _validate)
 
 async def to_code(config):
     hub = await cg.get_variable(config[CONF_PARENT_ID])
