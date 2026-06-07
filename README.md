@@ -1,3 +1,5 @@
+"This fork further fixes a regression in JerichoDK's fix that caused current_temperature to disappear from HA climate entities"
+
 # ESPHome Wavin AHC9000 v3 - ESPHome 2026.x Compatible Fork
 
 This fork fixes compilation errors introduced in ESPHome 2026.4+ which broke the original repository.
